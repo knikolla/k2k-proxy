@@ -6,6 +6,19 @@ The proxy will be set up in one OpenStack installation, called the Identity
 Provider, or IdP, and it redirect API calls to either the local services, or
 remote services in one of several Service Provider installations (SP).
 
+DevStack
+========
+Installation in DevStack can be automated by enabling the DevStack plugin.
+
+In your ``local.conf`` add: ::
+
+    enable_plugin proxy https://github.com/CCI-MOC/k2k-proxy.git
+
+    PROXY_PORT=<PORT_NUMBER>
+
+
+Manual
+======
 Install dependencies. ::
 
     $ pip install -r requirements.txt
@@ -13,7 +26,7 @@ Install dependencies. ::
 
 
 Web Server
-==========
+----------
 The recommended way is to run the proxy using uWSGI through the
 ``run_proxy.sh`` script. ::
 
@@ -38,7 +51,7 @@ To run the proxy with Apache in Ubuntu: ::
 
 
 Configuration
-=============
+-------------
 The proxy searches for the configuration file ``k2k-proxy.conf`` in the
 current directory, the ``etc/`` directory relative to the current directory or
 ``/etc/``
@@ -61,7 +74,7 @@ installation.  For instance::
     volume_endpoint="http://192.168.7.20:8776"
 
 Keystone Configuration
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 Keystone maintains the service catalog with information about all the
 configured endpoints.
@@ -76,11 +89,12 @@ In the IdP, delete and then recreate the endpoint which we will proxy. ::
         --region RegionOne \
         <endpoint_type>
 
+
 Where service_type is ``image`` if endpoint_type is ``image``
 and ``volume`` if endpoint_type is ``volume`` or ``volumev2``
 
 Nova Configuration
-------------------
+~~~~~~~~~~~~~~~~~~
 
 Nova reads the endpoint address for glance from the configuration file stored
 in ``/etc/nova/nova.conf``. So, in the IdP, add the following::
@@ -89,21 +103,24 @@ in ``/etc/nova/nova.conf``. So, in the IdP, add the following::
     [glance]
     api_servers=<proxy_url>/image
 
-Cinder Notification
--------------------
+
+Cinder and Glance Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Cinder reads the endpoint address for glance from the configuration file stored
-in ``/etc/cinder/cinder.conf``. So, in the IdP, add the following::
+in ``/etc/cinder/cinder.conf``. So, in the IdP, add the following: ::
 
     # /etc/cinder/cinder.conf
     [default]
     glance_api_servers=<proxy_url>/image
 
-Every Cinder must be configured to emit notifications on the messagebus.  So,
-in both the IdP and every SP, add the following to
-``/etc/cinder/cinder.conf``::
+
+Every Cinder (and Glance) must be configured to emit notifications on the
+messagebus. So, in both the IdP and every SP, add the following to
+``/etc/cinder/cinder.conf`` and ``/etc/glance/glance-api.conf``: ::
 
     # /etc/cinder/cinder.conf
+    # /etc/glance/glance-api.conf
     [oslo_messaging_notifications]
     driver = messaging
     topics = notifications

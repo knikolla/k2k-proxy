@@ -30,7 +30,7 @@ def main():
 
     client = auth.get_client()
 
-    host = 'http://localhost:5001'
+    host = 'http://localhost:%s' % config.CONF.proxy.port
 
     # Image
     service = client.services.list(type='image')[0]
