@@ -61,6 +61,61 @@ class ResourceMapping(BASE):
         return mapping
 
 
+class SpAuth(BASE):
+    """The auth credentials for a service provider."""
+
+    __tablename__ = 'sp_auth'
+    id = sql.Column(sql.Integer, primary_key=True)
+    sp = sql.Column(sql.String(255), nullable=False)
+    local_user_id = sql.Column(sql.String(255), nullable=False)
+    remote_username = sql.Column(sql.String(255), nullable=False)
+    remote_user_domain_id = sql.Column(sql.String(255), nullable=False)
+    remote_password = sql.Column(sql.String(255), nullable=False)
+
+    def __init__(self, sp, local_user_id, remote_username,
+                 remote_user_domain_id, remote_password):
+        self.sp = sp
+        self.local_user_id = local_user_id
+        self.remote_username = remote_username
+        self.remote_user_domain_id = remote_user_domain_id
+        self.remote_password = remote_password
+
+    @classmethod
+    def find(cls, local_user_id, sp):
+        context = enginefacade.transaction_context()
+        with enginefacade.reader.using(context) as session:
+            auth = session.query(SpAuth).filter_by(
+                local_user_id=local_user_id,
+                sp=sp
+            ).first()
+        return auth
+
+
+class SpProject(BASE):
+    """The projects for a specific user"""
+
+    __tablename__ = 'sp_project'
+    id = sql.Column(sql.Integer, primary_key=True)
+    sp = sql.Column(sql.String(255), nullable=False)
+    local_user_id = sql.Column(sql.String(255), nullable=False)
+    remote_project_id = sql.Column(sql.String(255), nullable=False)
+
+    def __init__(self, sp, local_user_id, remote_project_id):
+        self.sp = sp
+        self.local_user_id = local_user_id
+        self.remote_project_id = remote_project_id
+
+    @classmethod
+    def find(cls, local_user_id, sp):
+        context = enginefacade.transaction_context()
+        with enginefacade.reader.using(context) as session:
+            projects = session.query(SpAuth).filter_by(
+                local_user_id=local_user_id,
+                sp=sp
+            )
+        return projects
+
+
 def insert(entity):
     context = enginefacade.transaction_context()
     with enginefacade.writer.using(context) as session:

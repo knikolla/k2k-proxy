@@ -22,7 +22,7 @@ from mixmatch.config import LOG, CONF
 from mixmatch.session import app
 from mixmatch.session import chunked_reader
 from mixmatch.session import request
-from mixmatch import auth
+from mixmatch import sql_auth as auth
 from mixmatch import model
 from mixmatch import services
 
