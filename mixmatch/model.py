@@ -84,7 +84,7 @@ class SpAuth(BASE):
     def find(cls, local_user_id, sp):
         context = enginefacade.transaction_context()
         with enginefacade.reader.using(context) as session:
-            auth = session.query(SpAuth).filter_by(
+            auth = session.query(cls).filter_by(
                 local_user_id=local_user_id,
                 sp=sp
             ).first()
@@ -109,7 +109,7 @@ class SpProject(BASE):
     def find(cls, local_user_id, sp):
         context = enginefacade.transaction_context()
         with enginefacade.reader.using(context) as session:
-            projects = session.query(SpAuth).filter_by(
+            projects = session.query(cls).filter_by(
                 local_user_id=local_user_id,
                 sp=sp
             )
